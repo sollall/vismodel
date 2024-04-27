@@ -1,0 +1,9 @@
+services:
+  vismodel:
+    container_name: vismodel
+    build: .
+    working_dir: '/workspace/vismodel'
+    tty: true
+    volumes:
+      - ../:/workspace/vismodel
+    command: /bin/bash
