@@ -1,0 +1,6 @@
+{
+    "name": "vismodel DevContainer", // お好みの名前
+    "build": {
+        "dockerfile": "../environment/Dockerfile" // 相対パス表記
+    }
+}

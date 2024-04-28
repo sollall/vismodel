@@ -19,3 +19,8 @@ cd environment && docker compose up -d
 ```
 cd vismodel && conda activate vismodel && pip install -e .[dev]
 ```
+
+### devcontainerでの環境構築
+VSCodeのコマンドパレットを開く(Ctrl+Shift+P)
+
+コマンドパレットからDev Containers: Rebuild and Reopen in Containerを指定
