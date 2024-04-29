@@ -4,6 +4,13 @@ services:
     build: .
     working_dir: '/workspace/vismodel'
     tty: true
+    deploy:
+      resources:
+       reservations:
+         devices:
+           - capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
     volumes:
       - ../:/workspace/vismodel
     command: /bin/bash
