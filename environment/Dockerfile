@@ -1,19 +1,14 @@
-FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update \
     && apt-get -y upgrade \
-    && apt-get -y install curl git htop vim wget zip nodejs zip build-essential
+    && apt-get -y install curl git htop vim wget zip nodejs zip build-essential python3 python3.10 python3-pip  
 
 # add conda
-WORKDIR /opt
-ENV PATH /opt/miniconda3/bin:$PATH
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-    sh Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3 && \
-    rm -r Miniconda3-latest-Linux-x86_64.sh && \
-    conda init && conda create -n vismodel python=3.10
-
-WORKDIR /workspace
+RUN pip install --upgrade pip && \
+    pip install --upgrade setuptools && \
+    pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cu121
 
 CMD ["/bin/bash"]

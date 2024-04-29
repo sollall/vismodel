@@ -1,7 +1,5 @@
 #! /usr/bin/env python
 
-import itertools
-
 from setuptools import find_packages, setup
 
 import vismodel
