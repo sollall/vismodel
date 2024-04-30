@@ -15,7 +15,7 @@ VERSION = vismodel.__version__
 PYTHON_REQUIRES = ">=3.10"
 
 
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = ["numpy == 1.24.0","matplotlib == 3.8.4"]
 
 EXTRAS_REQUIRE = {
     "dev": ["ruff == 0.4.2", "pytest == 8.1.2"],
