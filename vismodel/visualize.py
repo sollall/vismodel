@@ -17,7 +17,7 @@ def visualize_wandb(model):
 
     layers=pickup_visualable_layers(model)
 
-    fig, axes = plt.subplots(2,len(layers), figsize=(15, 5))
+    fig, axes = plt.subplots(4,len(layers), figsize=(15, 5))
     for i,(name,layer) in enumerate(layers):
         if isinstance(layer,nn.Linear):
             #weightも入力数変えたらだめなるのでは
@@ -40,10 +40,14 @@ def visualize_wandb(model):
 
             bias_mat=layer.bias.unsqueeze(1)
             axes[1][i].imshow(bias_mat.detach().numpy(), cmap='viridis')
-        elif isinstance(layer,nn.LSTM):
-            #n_layersの数だけ
-            for n in layer.num_layers:
+        elif isinstance(layer,nn.LSTM) or isinstance(layer,nn.RNN) or isinstance(layer,nn.GRU):
+            #n_layersの数だけ表示させないとだけど今んとこ一層しか表示できてない
+            #隠れ層のweightの次元は4*隠れ層の次元らしい
+            for n in range(layer.num_layers):
                 #lstm.weight_ih_l0', 'lstm.weight_hh_l0', 'lstm.bias_ih_l0', 'lstm.bias_hh_l0'
-                pass
+                axes[0][i].imshow(layer.weight_ih_l0.detach().numpy())
+                axes[1][i].imshow(layer.bias_ih_l0.unsqueeze(1).detach().numpy())
+                axes[2][i].imshow(layer.weight_hh_l0.detach().numpy())
+                axes[3][i].imshow(layer.bias_hh_l0.unsqueeze(1).detach().numpy())
         else:
             print(name,layer)
