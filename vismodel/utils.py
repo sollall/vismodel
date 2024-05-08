@@ -1,15 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def pickup_visualable_layers(model):
+def pickup_visualable_layers(layers):
     """表示できるweightやbiasを持つlayerのみを持ってくる
 
     Args:
-        model (_type_): _description_
+        layers (dict): model.named_children()で呼び出せるlayersの情報
     """
     visualable_layers=[]
 
-    for name,layer in model.named_children():
+    for name,layer in layers:
         if hasattr(layer,"weight") or hasattr(layer,"bias"):
             visualable_layers.append((name,layer))
     return visualable_layers
@@ -31,4 +31,4 @@ def unite_weight_conv2d(weight_conv2d):
         weight_conv2d (_type_): _description_
     """
 
-    return matrix
+    return weight_conv2d
