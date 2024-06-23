@@ -1,10 +1,8 @@
+import datetime
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import torch
-import torch.nn as nn
-
-from .utils import pickup_visualable_layers
 
 """
 torch.nnモジュールで重みを持つ主なクラスは、torch.nn.Moduleを継承した以下のクラスです：
@@ -185,26 +183,23 @@ def make_image_transformer(name, transformer):
 
 def visualize_wandb(model):
     # 各layerの処理を関数化すべきでは
+    # 変数ごとにファイル作りたい気がする
+    # layer.1とかをなんとかしたい
 
-    layers = pickup_visualable_layers(model.named_children())
+    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = Path("./outputs")
+    output_path /= current_time
 
-    # layerごとに画像が作成されていくべきでは？
-    for i, (name, layer) in enumerate(layers):
-        if isinstance(layer, nn.Linear):  # or isinstance(layer, nn.LayerNorm):
-            # weightも入力数変えたらだめなるのでは
-            make_imgage_Linear(name, layer)
+    for k, v in model.named_parameters():
+        k = k.replace(".", "/")
+        save_path = output_path / k
+        save_path.parent.mkdir(parents=True, exist_ok=True)
 
-        elif isinstance(layer, nn.Conv1d):
-            # unsqueezeの処理が違うだけなのでそこをここで直して可視化は共通処理にするべきだ
-            make_image_Conv1d(name, layer)
-
-        elif isinstance(layer, nn.Conv2d):
-            make_image_Conv2d(name, layer)
-
-        elif isinstance(layer, nn.LSTM) or isinstance(layer, nn.RNN) or isinstance(layer, nn.GRU):
-            make_image_recurrent(name, layer)
-
-        elif isinstance(layer, nn.Transformer):
-            visualize_wandb(name, layer)
+        # weightの次元に応じてにするか？もしくは
+        fig, ax = plt.subplots(1, 1, figsize=(15, 5))
+        if v.dim() == 1:
+            ax.imshow(v.unsqueeze(1).detach().numpy(), cmap="viridis")
         else:
-            print(name, layer)
+            ax.imshow(v.detach().numpy(), cmap="viridis")
+
+        plt.savefig(save_path)
