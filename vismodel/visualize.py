@@ -1,7 +1,9 @@
 import datetime
 from pathlib import Path
 
+import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 
 """
@@ -119,73 +121,7 @@ def make_image_recurrent(name, layer):
     return
 
 
-def make_image_transformer(name, transformer):
-    """
-    Transfomrmer用にimageを作るのはあり layout色々変えたくなると思うから
-    Transformer(
-      (encoder): TransformerEncoder(
-        (layers): ModuleList(
-          (0-11): 12 x TransformerEncoderLayer(
-            (self_attn): MultiheadAttention(
-              (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
-            )
-            (linear1): Linear(in_features=512, out_features=2048, bias=True)
-            (dropout): Dropout(p=0.1, inplace=False)
-            (linear2): Linear(in_features=2048, out_features=512, bias=True)
-            (norm1): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
-            (norm2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
-            (dropout1): Dropout(p=0.1, inplace=False)
-            (dropout2): Dropout(p=0.1, inplace=False)
-          )
-        )
-        (norm): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
-      )
-      (decoder): TransformerDecoder(
-        (layers): ModuleList(
-          (0-5): 6 x TransformerDecoderLayer(
-            (self_attn): MultiheadAttention(
-              (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
-            )
-            (multihead_attn): MultiheadAttention(
-              (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
-            )
-            (linear1): Linear(in_features=512, out_features=2048, bias=True)
-            (dropout): Dropout(p=0.1, inplace=False)
-            (linear2): Linear(in_features=2048, out_features=512, bias=True)
-            (norm1): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
-            (norm2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
-            (norm3): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
-            (dropout1): Dropout(p=0.1, inplace=False)
-            (dropout2): Dropout(p=0.1, inplace=False)
-            (dropout3): Dropout(p=0.1, inplace=False)
-          )
-        )
-        (norm): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
-      )
-    )
-    """
-    # enocder
-    # 1-6個
-    for i, layer in enumerate(transformer.encoder.layers):
-        visualize_wandb(layer)
-    # self_attn
-    # liner1
-    # liner2
-    # norm1
-    # norm2
-
-    # decoder
-    for i, layer in enumerate(transformer.decoder.layers):
-        visualize_wandb(layer)
-
-    return
-
-
 def visualize_wandb(model):
-    # 各layerの処理を関数化すべきでは
-    # 変数ごとにファイル作りたい気がする
-    # layer.1とかをなんとかしたい
-
     current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_path = Path("./outputs")
     output_path /= current_time
@@ -203,3 +139,29 @@ def visualize_wandb(model):
             ax.imshow(v.detach().numpy(), cmap="viridis")
 
         plt.savefig(save_path)
+
+
+class WandbHolder:
+    def __init__(self, weights):
+        # 設計悩む
+        # 初期にモデルのstateをもらってlogだけ作るか
+        self.sample_weight = weights
+        self.save_path = "class_output.gif"  # fix later
+
+    def add_model_state(self):
+        return
+
+    def _update(self, i):
+        a = self.sample_weight[i]
+        print(i, a)
+        plt.clf()
+        plt.imshow(a)
+
+    def save_gif(self):
+        fig, ax = plt.subplots()
+        N = len(self.sample_weight)
+
+        ani = animation.FuncAnimation(fig, self._update, np.arange(1, N), interval=25)  # 代入しないと消される
+
+        # Display the animation
+        ani.save(self.save_path, writer="imagemagick")
