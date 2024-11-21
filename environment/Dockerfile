@@ -9,6 +9,6 @@ RUN apt-get update \
 # add conda
 RUN pip install --upgrade pip && \
     pip install --upgrade setuptools && \
-    pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cu121
+    pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu121
 
 CMD ["/bin/bash"]
